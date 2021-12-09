@@ -6,12 +6,8 @@ var io = require('socket.io')(http)
 var mongoose = require('mongoose')
 
 
-
-console.log(Object.keys(process.env));
-
-
-var username = 'shenghangzhu';
-var password = 'passwordpassword';
+var username = 'tempAdmin';
+var password = 'adminadmin';
 
 const uri = `mongodb+srv://${username}:${password}@learnning.xztbj.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 // const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
@@ -43,6 +39,14 @@ app.post('/messages', (req, res) => {
         if (err) {
             sendStatus(500)
         }
+        Message.findOne({message:'badword'},(err,censored)=>{
+            if(censored){
+                console.log('censored words found',censored)
+                Message.remove({_id:censored.id},(err)=>{
+                    console.log('removed censored message');
+                })
+            }
+        })
         io.emit('message', req.body);
         res.sendStatus(200);
     })
